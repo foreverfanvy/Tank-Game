@@ -12,10 +12,12 @@ public class Main extends JFrame {
     }
     public Main() {
         panel = new MyPanel();
+        new Thread(panel).start();
         this.add(panel);
         this.setSize(1000,750);
         this.setVisible(true);
-        this.addKeyListener(panel);
+        this.addKeyListener(panel);//JFame来监听画板
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 }

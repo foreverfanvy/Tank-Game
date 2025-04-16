@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class MyPanel extends JPanel implements KeyListener {
+public class MyPanel extends JPanel implements KeyListener,Runnable {
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -32,6 +32,9 @@ public class MyPanel extends JPanel implements KeyListener {
             son1_Tank.setDirection(1);
             son1_Tank.setX(son1_Tank.getX() + son1_Tank.getSpeed());
         }
+        if(e.getKeyCode() == KeyEvent.VK_J) {
+            son1_Tank.shotting();
+        }
         this.repaint();
     }
 
@@ -44,6 +47,7 @@ public class MyPanel extends JPanel implements KeyListener {
     public MyPanel() {
         son1_Tank = new Son1_Tank(100, 100);
         son1_Tank.setSpeed(2);
+
     }
 
     @Override
@@ -55,8 +59,30 @@ public class MyPanel extends JPanel implements KeyListener {
         //        draw_Tank(200,200,3,1,g);
         //        draw_Tank(300,300,0,0,g);
         //功能测试
-        draw_Tank(son1_Tank.getX(),son1_Tank.getY(),son1_Tank.getDirection(),son1_Tank.getTpye(),g);
+        //画出坦克
+        draw_Tank(son1_Tank.getX(),son1_Tank.getY(),son1_Tank.getDirection(),
+                son1_Tank.getTpye(),g);
+        //画出子弹
+//        draw_shot(son1_Tank.getShot().getX(),son1_Tank.getShot().getY(),
+//        son1_Tank.getDirection(),son1_Tank.getTpye(),g);
+        if((son1_Tank.shot!=null) && (son1_Tank.shot.isLive == true)){
+            g.setColor(Color.red);
+            g.draw3DRect(son1_Tank.shot.x,son1_Tank.shot.y,2,2, false);
+            System.out.println("子弹被绘制！");
+        }
     }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(10);
+            }catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.repaint();
+        }
+    }//不断的刷新绘图区域
 
     /**
      *
@@ -106,4 +132,34 @@ public class MyPanel extends JPanel implements KeyListener {
                 break;
         }
     }
-}
+
+//    public void draw_shot(int x,int y,int direction,int type,Graphics g) {
+//        if(son1_Tank.getShot()==null){
+//            return;
+//        }
+//        if(son1_Tank.getShot().isLiife == false){
+//            return;
+//        }
+//        switch (type) {
+//            case 0://我们的坦克，普通的青色
+//                g.setColor(Color.cyan);
+//                break;
+//            case 1://敌人的坦克，黄色
+//                g.setColor(Color.yellow);
+//                break;
+//        }
+//        switch (direction) {
+//            case 0:
+//                g.drawLine(getX()+20, getY(), getX()+20, getY()+2);
+//                break;
+//            case 1:
+//                g.drawLine(getX()+60, getY()+20, getX()+62, getY()+20);
+//            case 2:
+//                g.drawLine(getX()+20, getY()+60, getX()+20, getY()+62);
+//                break;
+//            case 3:
+//                g.drawLine(getX(), getY()+20, getX()-2, getY()+20);
+//                break;
+//        }
+//没有错但是有缺少不断渲染的步骤启动新的线程按休眠时间来渲染子弹
+    }
