@@ -5,15 +5,7 @@ public class Tank {
     private int y;
     private int direction;
     private int tpye;
-    private int speed = 1;
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
+    private int speed = 100;
 
     public Tank(int x, int y, int direction, int tpye) {
         this.x = x;
@@ -21,15 +13,25 @@ public class Tank {
         this.direction = direction;
         this.tpye = tpye;
     }
-    public  Tank(int x, int y, int direction) {
+
+    public Tank(int x, int y, int direction) {
         this.x = x;
         this.y = y;
         this.direction = direction;
         this.tpye = 0;
     }
+
     public Tank(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public int getX() {

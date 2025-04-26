@@ -42,16 +42,16 @@ class MYPanel extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
 //        System.out.println((char)e.getKeyCode() +"Key pressed");
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 y--;
                 break;
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 x--;
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 x++;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 y++;
                 break;
         }//这个要上下左右键，而WSAD要用if来写
