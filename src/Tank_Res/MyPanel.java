@@ -37,6 +37,14 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         image1 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_1.gif"));
         image2 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_2.gif"));
         image3 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_3.gif"));
+        //修复bug1
+        Toolkit.getDefaultToolkit().prepareImage(image1, -1, -1, null);   // 同步等图像解码
+//        目前你的流程是：
+//        image1 = Toolkit.getDefaultToolkit().getImage(...); ← 异步加载
+//        第一次命中 → boomVector.add(...)
+//        立即 repaint() → g.drawImage(image1, …） GIF 还没解码完，drawImage 其实什么都没画
+//        你马上 boom.life--，第一颗 Boom 很快就被移除了
+//        所以首炸看不到。
     }
 
     //用来判断子弹是否击中目标的函数
