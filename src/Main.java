@@ -2,6 +2,7 @@ import Tank_Res.MyPanel;
 
 import javax.swing.*;
 
+@SuppressWarnings("all")
 //This is the main fuction to start this game
 public class Main extends JFrame {
     MyPanel panel = null;

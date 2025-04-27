@@ -1,10 +1,14 @@
 package Tank_Res;
 
-public class Son1_Tank extends Tank {
+import java.util.Vector;
+
+@SuppressWarnings("all")
+public class MyTank extends Tank {
     //表示对应tank的射击行为
     public Shot shot = null;
+    Vector<Shot> shots = new Vector<>();
 
-    public Son1_Tank(int x, int y) {
+    public MyTank(int x, int y) {
         super(x, y);
     }
 
@@ -24,8 +28,11 @@ public class Son1_Tank extends Tank {
                 shot = new Shot(getX(), getY() + 20, 3);
                 break;
         }
-        new Thread(shot).start();//启动子弹的移动线程，姑且称为线程2
-
+        //设置发射子弹的上限，最多为5颗
+        if(shots.size() < 5) {
+            new Thread(shot).start();//启动子弹的移动线程，姑且称为线程2姑且称为线程2
+            shots.add(shot);
+        }else return;
     }
 
 }

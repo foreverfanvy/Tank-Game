@@ -2,7 +2,7 @@ package Tank_Res;
 
 import java.util.Vector;
 
-
+@SuppressWarnings("all")
 public class EnemyTank extends Tank implements Runnable {
     public Vector<Shot> shots = new Vector<>();
     public boolean isLive = true;

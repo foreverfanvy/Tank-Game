@@ -10,7 +10,7 @@ import java.util.Vector;
 @SuppressWarnings("all")
 public class MyPanel extends JPanel implements KeyListener, Runnable {
     int EnemySize = 3;
-    Son1_Tank son1_Tank = null;
+    MyTank my_Tank = null;
     Vector<EnemyTank> enemyTankVector = new Vector();
     Vector<Boom> boomVector = new Vector();
 
@@ -21,8 +21,8 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     public MyPanel() {
         //创建自己坦克的位置
-        son1_Tank = new Son1_Tank(100, 100);
-        son1_Tank.setSpeed(2);
+        my_Tank = new MyTank(100, 100);
+        my_Tank.setSpeed(2);
         //创建敌人的初始坦克
         for (int i = 0; i < EnemySize; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
@@ -51,34 +51,39 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     //用来判断子弹是否击中目标的函数
     //判断什么时候击中？必须一直循环着判断（run方法中进行判断）
-    public void HitTank(Shot s, EnemyTank enemyTank) {
+    public void HitTank(Vector<Shot> s, EnemyTank enemyTank) {
         //判断集中坦克没有，就是s.x和tank.x等属性的比较
-        switch (enemyTank.getDirection()) {
-            case 0:
-            case 2:
-                if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 40
-                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60) {
-                    s.isLive = false;
-                    //这个可以让敌人的坦克死亡
-                    enemyTank.isLive = false;
-                    //击中后删除这个enemyTank
-                    enemyTankVector.remove(enemyTank);
-                    Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
-                    boomVector.add(boom);
-                }//这个少了个大括号导致出现了一堆bug我去
-                break;
-            case 1:
-            case 3:
-                if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 60
-                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40) {
-                    s.isLive = false;
-                    enemyTank.isLive = false;
-                    enemyTankVector.remove(enemyTank);
-                    Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
-                    boomVector.add(boom);
-                }
-                break;
+        Iterator<Shot> iterator = s.iterator();
+        while (iterator.hasNext()) {
+            Shot next =  iterator.next();
+            switch (enemyTank.getDirection()) {
+                case 0:
+                case 2:
+                    if (next.x > enemyTank.getX() && next.x < enemyTank.getX() + 40
+                            && next.y > enemyTank.getY() && next.y < enemyTank.getY() + 60) {
+                        next.isLive = false;
+                        //这个可以让敌人的坦克死亡
+                        enemyTank.isLive = false;
+                        //击中后删除这个enemyTank
+                        enemyTankVector.remove(enemyTank);
+                        Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
+                        boomVector.add(boom);
+                    }//这个少了个大括号导致出现了一堆bug我去
+                    break;
+                case 1:
+                case 3:
+                    if (next.x > enemyTank.getX() && next.x < enemyTank.getX() + 60
+                            && next.y > enemyTank.getY() && next.y < enemyTank.getY() + 40) {
+                        next.isLive = false;
+                        enemyTank.isLive = false;
+                        enemyTankVector.remove(enemyTank);
+                        Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
+                        boomVector.add(boom);
+                    }
+                    break;
+            }
         }
+
     }
 
     @Override
@@ -88,22 +93,25 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        son1_Tank.setTpye(0);
+        my_Tank.setTpye(0);
         if (e.getKeyCode() == KeyEvent.VK_W) {
-            son1_Tank.setDirection(0);
-            if (son1_Tank.getY() > 0) son1_Tank.moveUp();
+            my_Tank.setDirection(0);
+            if (my_Tank.getY() > 0) my_Tank.moveUp();
         } else if (e.getKeyCode() == KeyEvent.VK_S) {
-            son1_Tank.setDirection(2);
-            if (son1_Tank.getY() + 60 < 750) son1_Tank.moveDown();
+            my_Tank.setDirection(2);
+            if (my_Tank.getY() + 60 < 750) my_Tank.moveDown();
         } else if (e.getKeyCode() == KeyEvent.VK_A) {
-            son1_Tank.setDirection(3);
-            if (son1_Tank.getX() > 0) son1_Tank.moveLeft();
+            my_Tank.setDirection(3);
+            if (my_Tank.getX() > 0) my_Tank.moveLeft();
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
-            son1_Tank.setDirection(1);
-            if (son1_Tank.getX() + 60 < 1000) son1_Tank.moveRight();
+            my_Tank.setDirection(1);
+            if (my_Tank.getX() + 60 < 1000) my_Tank.moveRight();
         }
         if (e.getKeyCode() == KeyEvent.VK_J) {
-            son1_Tank.shotting();
+            my_Tank.shotting();
+            //  if(my_Tank.shot ==  null && !my_Tank.shot.isLive ) {//!MyTank.shot.isLive这种表达方式的意义是为非MyTank.shot.isLive == true
+            //  my_Tank.shotting();
+            //  }//使子弹消失后才能打出子弹（最最基础的防刷新子弹的功能！！！线程消亡和对象有没有消亡没有任何关系！！！）
         }
         this.repaint();
     }
@@ -117,10 +125,14 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0, 0, 1000, 750);
-        //画出自己的坦克（自己的Tank是Son1_Tank）
-        draw_Tank(son1_Tank.getX(), son1_Tank.getY(), son1_Tank.getDirection(),
-                son1_Tank.getTpye(), g);
-        //有关敌人坦克的绘制
+
+
+        //画出自己的坦克（自己的Tank是MyTank）
+        draw_Tank(my_Tank.getX(), my_Tank.getY(), my_Tank.getDirection(),
+                my_Tank.getTpye(), g);
+
+
+        //有关敌人坦克的绘制,包括敌人的tank的子弹
         Iterator<EnemyTank> it = enemyTankVector.iterator();
         while (it.hasNext()) {
             EnemyTank enemyTank = it.next();
@@ -163,12 +175,19 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                 enemyTankVector.remove(enemyTank);
             }
         }
-        //画出自己的子弹
-        if ((son1_Tank.shot != null) && (son1_Tank.shot.isLive == true)) {
-            g.setColor(Color.red);
-            g.draw3DRect(son1_Tank.shot.x, son1_Tank.shot.y, 2, 2, false);
-            //            System.out.println("子弹被绘制！");(日志测试代码)
+
+        //画出自己的子弹，由于连发机制的添加，在绘制的时候需要实现相关的遍历了
+        g.setColor(Color.red);
+        Iterator<Shot> shotIt = my_Tank.shots.iterator();
+        while (shotIt.hasNext()) {
+            Shot shot = shotIt.next();
+            if ((shot != null) && (shot.isLive == true)) {
+                g.draw3DRect(shot.x, shot.y, 2, 2, false);
+                //System.out.println("子弹被绘制！");//(日志测试代码)
+            } else my_Tank.shots.remove(shot);
         }
+
+
         //boomVector中有炸弹就要进行绘制特效
         if (boomVector.size() != 0) {
             for (int i = 0; i < boomVector.size(); i++) {
@@ -198,13 +217,13 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                 e.printStackTrace();
             }
             //判断敌人是否被击中
-            if (son1_Tank.shot != null && son1_Tank.shot.isLive == true) {
-                //此处会有异常出现（每点击J的时候son1_Tank.shot才不为空）
+            if (my_Tank.shot != null && my_Tank.shot.isLive == true) {
+                //此处会有异常出现（每点击J的时候MyTank.shot才不为空）
                 //自己的子弹还活着的时候
                 for (int i = 0; i < enemyTankVector.size(); i++) {
                     //遍历敌人所有的tank，取出tank来进行Tank判断是否死亡
                     EnemyTank enemyTank = enemyTankVector.get(i);
-                    HitTank(son1_Tank.shot, enemyTank);
+                    HitTank(my_Tank.shots, enemyTank);
                     //判断敌人的Tank是不是被hit了,击中了就死掉
                 }
             }

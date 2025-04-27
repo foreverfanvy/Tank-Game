@@ -1,5 +1,6 @@
 package Tank_Res;
 
+@SuppressWarnings("all")
 public class Boom {
     int x, y;
     int life = 9;//设置生命周期是9

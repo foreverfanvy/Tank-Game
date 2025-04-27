@@ -1,5 +1,6 @@
 package Tank_Res;
 
+@SuppressWarnings("all")
 public class Shot implements Runnable {
     int x;
     int y;

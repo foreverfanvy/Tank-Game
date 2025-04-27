@@ -1,5 +1,6 @@
 package Tank_Res;
 
+@SuppressWarnings("all")
 public class Tank {
     private int x;
     private int y;
