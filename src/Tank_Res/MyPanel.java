@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Iterator;
 import java.util.Vector;
 
 @SuppressWarnings("all")
@@ -11,6 +12,12 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     int EnemySize = 3;
     Son1_Tank son1_Tank = null;
     Vector<EnemyTank> enemyTankVector = new Vector();
+    Vector<Boom> boomVector = new Vector();
+
+    //创建三张图片来显示爆炸效果
+    Image image1;
+    Image image2;
+    Image image3;
 
     public MyPanel() {
         //创建自己坦克的位置
@@ -26,12 +33,15 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             enemyTank.shots.add(s);
             new Thread(s).start();//启动敌人的子弹的线程，姑且成为3号线程
         }
-
+        //再构造器里面初始化图片对象
+        image1 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_1.gif"));
+        image2 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_2.gif"));
+        image3 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_3.gif"));
     }
 
     //用来判断子弹是否击中目标的函数
     //判断什么时候击中？必须一直循环着判断（run方法中进行判断）
-    public static void HitTank(Shot s, EnemyTank enemyTank) {
+    public void HitTank(Shot s, EnemyTank enemyTank) {
         //判断集中坦克没有，就是s.x和tank.x等属性的比较
         switch (enemyTank.getDirection()) {
             case 0:
@@ -40,14 +50,20 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                         && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60){
                     s.isLive = false;
                     //这个可以让敌人的坦克死亡
-                    enemyTank.isLive = false;}//这个少了个大括号导致出现了一堆bug我去
+                    enemyTank.isLive = false;
+                    Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
+                    boomVector.add(boom);
+                }//这个少了个大括号导致出现了一堆bug我去
                     break;
             case 1:
             case 3:
                 if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 60
                         && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40){
                     s.isLive = false;
-                    enemyTank.isLive = false;}
+                    enemyTank.isLive = false;
+                    Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
+                    boomVector.add(boom);
+                }
                     break;
         }
     }
@@ -92,7 +108,28 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         draw_Tank(son1_Tank.getX(), son1_Tank.getY(), son1_Tank.getDirection(),
                 son1_Tank.getTpye(), g);
         //有关敌人坦克的绘制
-        for (int i = 0; i < enemyTankVector.size(); i++) {
+        Iterator<EnemyTank> it = enemyTankVector.iterator();
+        while (it.hasNext()) {
+            EnemyTank enemyTank = it.next();
+            if (enemyTank.isLive) {
+                // 敌人还活着，就画出来
+                draw_Tank(enemyTank.getX(), enemyTank.getY(), enemyTank.getDirection(), 1, g);
+
+                // 画敌人子弹，也用 Iterator
+                Iterator<Shot> shotIt = enemyTank.shots.iterator();
+                while (shotIt.hasNext()) {
+                    Shot shot = shotIt.next();
+                    if (shot.isLive) {
+                        g.draw3DRect(shot.x, shot.y, 2, 2, false);
+                    } else {
+                        shotIt.remove(); // 子弹死了，安全删除
+                    }
+                }
+            } else {
+                // 如果敌人已经死了，从 Vector 中安全删除
+                it.remove();
+            }
+        }for (int i = 0; i < enemyTankVector.size(); i++) {
             EnemyTank enemyTank = enemyTankVector.get(i);
             //当前tank存活才会进行绘制
             if (enemyTank.isLive == true) {
@@ -109,13 +146,35 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                     }
                 }
             }
+            if(enemyTank.isLive == false) {
+                enemyTankVector.remove(enemyTank);
+            }
         }
         //画出自己的子弹
         if ((son1_Tank.shot != null) && (son1_Tank.shot.isLive == true)) {
             g.setColor(Color.red);
             g.draw3DRect(son1_Tank.shot.x, son1_Tank.shot.y, 2, 2, false);
             //            System.out.println("子弹被绘制！");(日志测试代码)
-
+        }
+        //boomVector中有炸弹就要进行绘制特效
+        if(boomVector.size() != 0){
+            for (int i = 0; i < boomVector.size(); i++) {
+                Boom boom = boomVector.get(i);
+                if (boom.life > 6 ) {
+                    g.drawImage(image1,boom.x, boom.y, 60,60,this);
+                }
+                else if(boom.life > 3){
+                    g.drawImage(image2,boom.x, boom.y, 60,60,this);
+                }
+                else if(boom.life > 0){
+                    g.drawImage(image3,boom.x, boom.y, 60,60,this);
+                }
+                boom.lifeDowm();//为了实现不断变小的效果，不然仅仅就是独立的三次展示不够明显和自然
+                if(boom.life == 0){
+                    boomVector.remove(boom);
+                    i--;//删除了这个元素，后续会出现补位的现象，所以需要倒回去重新实现一下
+                }
+            }
         }
     }
 
