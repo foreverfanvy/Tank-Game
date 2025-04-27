@@ -6,7 +6,7 @@ public class Shot implements Runnable {
     int direction = 0;
     int speed = 2;
     boolean isLive = true;
-    int index =0;
+    int index = 0;
 
     public Shot(int x, int y, int direction) {
         this.x = x;
@@ -40,7 +40,7 @@ public class Shot implements Runnable {
 //            测试输出功能
 //            System.out.println("x: " + x + " y: " + y);
             //当子弹碰到别的tankor边界就进行退出
-            if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 750 && isLive) ) {
+            if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 750 && isLive)) {
                 isLive = false;
                 break;
             }

@@ -57,7 +57,7 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             case 0:
             case 2:
                 if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 40
-                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60){
+                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60) {
                     s.isLive = false;
                     //这个可以让敌人的坦克死亡
                     enemyTank.isLive = false;
@@ -66,18 +66,18 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                     Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
                     boomVector.add(boom);
                 }//这个少了个大括号导致出现了一堆bug我去
-                    break;
+                break;
             case 1:
             case 3:
                 if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 60
-                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40){
+                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40) {
                     s.isLive = false;
                     enemyTank.isLive = false;
                     enemyTankVector.remove(enemyTank);
                     Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
                     boomVector.add(boom);
                 }
-                    break;
+                break;
         }
     }
 
@@ -91,16 +91,16 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         son1_Tank.setTpye(0);
         if (e.getKeyCode() == KeyEvent.VK_W) {
             son1_Tank.setDirection(0);
-            son1_Tank.setY(son1_Tank.getY() - son1_Tank.getSpeed());
+            if (son1_Tank.getY() > 0) son1_Tank.moveUp();
         } else if (e.getKeyCode() == KeyEvent.VK_S) {
             son1_Tank.setDirection(2);
-            son1_Tank.setY(son1_Tank.getY() + son1_Tank.getSpeed());
+            if (son1_Tank.getY() + 60 < 750) son1_Tank.moveDown();
         } else if (e.getKeyCode() == KeyEvent.VK_A) {
             son1_Tank.setDirection(3);
-            son1_Tank.setX(son1_Tank.getX() - son1_Tank.getSpeed());
+            if (son1_Tank.getX() > 0) son1_Tank.moveLeft();
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
             son1_Tank.setDirection(1);
-            son1_Tank.setX(son1_Tank.getX() + son1_Tank.getSpeed());
+            if (son1_Tank.getX() + 60 < 1000) son1_Tank.moveRight();
         }
         if (e.getKeyCode() == KeyEvent.VK_J) {
             son1_Tank.shotting();
@@ -141,7 +141,8 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                 // 如果敌人已经死了，从 Vector 中安全删除
                 it.remove();
             }
-        }for (int i = 0; i < enemyTankVector.size(); i++) {
+        }
+        for (int i = 0; i < enemyTankVector.size(); i++) {
             EnemyTank enemyTank = enemyTankVector.get(i);
             //当前tank存活才会进行绘制
             if (enemyTank.isLive == true) {
@@ -158,7 +159,7 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                     }
                 }
             }
-            if(enemyTank.isLive == false) {
+            if (enemyTank.isLive == false) {
                 enemyTankVector.remove(enemyTank);
             }
         }
@@ -169,20 +170,18 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             //            System.out.println("子弹被绘制！");(日志测试代码)
         }
         //boomVector中有炸弹就要进行绘制特效
-        if(boomVector.size() != 0){
+        if (boomVector.size() != 0) {
             for (int i = 0; i < boomVector.size(); i++) {
                 Boom boom = boomVector.get(i);
-                if (boom.life > 6 ) {
-                    g.drawImage(image1,boom.x, boom.y, 60,60,this);
-                }
-                else if(boom.life > 3){
-                    g.drawImage(image2,boom.x, boom.y, 60,60,this);
-                }
-                else if(boom.life > 0){
-                    g.drawImage(image3,boom.x, boom.y, 60,60,this);
+                if (boom.life > 6) {
+                    g.drawImage(image1, boom.x, boom.y, 60, 60, this);
+                } else if (boom.life > 3) {
+                    g.drawImage(image2, boom.x, boom.y, 60, 60, this);
+                } else if (boom.life > 0) {
+                    g.drawImage(image3, boom.x, boom.y, 60, 60, this);
                 }
                 boom.lifeDowm();//为了实现不断变小的效果，不然仅仅就是独立的三次展示不够明显和自然
-                if(boom.life == 0){
+                if (boom.life == 0) {
                     boomVector.remove(boom);
                     i--;//删除了这个元素，后续会出现补位的现象，所以需要倒回去重新实现一下
                 }

@@ -67,17 +67,20 @@ public class Tank {
     }
 
 
-    public void moveUp(){
-        y-=speed;
+    public void moveUp() {
+        y -= speed;
     }
-    public void moveDown(){
-        y+=speed;
+
+    public void moveDown() {
+        y += speed;
     }
-    public void moveLeft(){
-        x-=speed;
+
+    public void moveLeft() {
+        x -= speed;
     }
-    public void moveRight(){
-        x+=speed;
+
+    public void moveRight() {
+        x += speed;
     }
 
 }
