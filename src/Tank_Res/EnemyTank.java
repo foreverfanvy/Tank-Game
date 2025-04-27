@@ -3,7 +3,7 @@ package Tank_Res;
 import java.util.Vector;
 
 
-public class EnemyTank extends Tank {
+public class EnemyTank extends Tank implements Runnable {
     public Vector<Shot> shots = new Vector<>();
     public boolean isLive = true;
     public int type = 1;
@@ -11,5 +11,58 @@ public class EnemyTank extends Tank {
 
     public EnemyTank(int x, int y) {
         super(x, y);
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            switch (getDirection()) {
+                case 0:
+                    for (int i = 0; i < 20; i++) {
+                        try{
+                            Thread.sleep(50);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        moveUp();
+                    }
+                    break;
+                case 1:
+                    for (int i = 0; i < 20; i++) {
+                        try{
+                            Thread.sleep(50);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        moveRight();
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < 20; i++) {
+                        try{
+                            Thread.sleep(50);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        moveDown();
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < 20; i++) {
+                        try{
+                            Thread.sleep(50);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        moveLeft();
+                    }
+                    break;
+            }
+
+            setDirection((int)(Math.random()*4));//随机设置一个方向[0,4)利用int取整
+            //退出线程的条件设计！！！（并发程序的关键）
+            if(this.isLive == false)break;//被击中->isLive==false就退出循环
+
+        }
     }
 }

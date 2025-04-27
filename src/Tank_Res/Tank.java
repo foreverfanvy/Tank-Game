@@ -5,7 +5,7 @@ public class Tank {
     private int y;
     private int direction;
     private int tpye;
-    private int speed = 100;
+    private int speed = 2;
 
     public Tank(int x, int y, int direction, int tpye) {
         this.x = x;
@@ -65,4 +65,19 @@ public class Tank {
     public void setTpye(int tpye) {
         this.tpye = tpye;
     }
+
+
+    public void moveUp(){
+        y-=speed;
+    }
+    public void moveDown(){
+        y+=speed;
+    }
+    public void moveLeft(){
+        x-=speed;
+    }
+    public void moveRight(){
+        x+=speed;
+    }
+
 }
