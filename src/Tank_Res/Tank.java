@@ -7,6 +7,7 @@ public class Tank {
     private int direction;
     private int tpye;
     private int speed = 2;
+    public boolean isLive = true;
 
     public Tank(int x, int y, int direction, int tpye) {
         this.x = x;

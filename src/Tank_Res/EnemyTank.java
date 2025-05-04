@@ -5,7 +5,6 @@ import java.util.Vector;
 @SuppressWarnings("all")
 public class EnemyTank extends Tank implements Runnable {
     public Vector<Shot> shots = new Vector<>();
-    public boolean isLive = true;
     public int type = 1;
     //创建一个表来存子弹
 

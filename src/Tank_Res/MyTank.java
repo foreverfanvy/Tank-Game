@@ -13,6 +13,7 @@ public class MyTank extends Tank {
     }
 
     public void shotting() {
+        if (!isLive) return;               // ← 新增：死亡就退出
         //先创建一个子弹，需要关于Tank的方向信息
         switch (getDirection()) {
             case 0:

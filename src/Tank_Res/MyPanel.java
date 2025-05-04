@@ -7,7 +7,7 @@ import java.awt.event.KeyListener;
 import java.util.Iterator;
 import java.util.Vector;
 
-@SuppressWarnings("all")
+//@SuppressWarnings("all")
 public class MyPanel extends JPanel implements KeyListener, Runnable {
     int EnemySize = 3;
     MyTank my_Tank = null;
@@ -51,40 +51,38 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     //用来判断子弹是否击中目标的函数
     //判断什么时候击中？必须一直循环着判断（run方法中进行判断）
-    public void HitTank(Vector<Shot> s, EnemyTank enemyTank) {
-        //判断集中坦克没有，就是s.x和tank.x等属性的比较
-        Iterator<Shot> iterator = s.iterator();
-        while (iterator.hasNext()) {
-            Shot next =  iterator.next();
-            switch (enemyTank.getDirection()) {
-                case 0:
-                case 2:
-                    if (next.x > enemyTank.getX() && next.x < enemyTank.getX() + 40
-                            && next.y > enemyTank.getY() && next.y < enemyTank.getY() + 60) {
-                        next.isLive = false;
-                        //这个可以让敌人的坦克死亡
-                        enemyTank.isLive = false;
-                        //击中后删除这个enemyTank
-                        enemyTankVector.remove(enemyTank);
-                        Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
-                        boomVector.add(boom);
-                    }//这个少了个大括号导致出现了一堆bug我去
-                    break;
-                case 1:
-                case 3:
-                    if (next.x > enemyTank.getX() && next.x < enemyTank.getX() + 60
-                            && next.y > enemyTank.getY() && next.y < enemyTank.getY() + 40) {
-                        next.isLive = false;
-                        enemyTank.isLive = false;
-                        enemyTankVector.remove(enemyTank);
-                        Boom boom = new Boom(enemyTank.getX(), enemyTank.getY());
-                        boomVector.add(boom);
-                    }
-                    break;
+    /** 判定一组子弹 shots 是否击中目标 tank */
+    private void hitTank(Vector<Shot> shots, Tank tank) {
+        Iterator<Shot> it = shots.iterator();          // 用迭代器，方便安全删除
+        while (it.hasNext()) {
+            Shot s = it.next();
+            if (!s.isLive || !tank.isLive) continue;
+
+            boolean hit;
+            if (tank.getDirection() % 2 == 0) {        // 0/2 竖直
+                hit = s.x > tank.getX() && s.x < tank.getX() + 40 &&
+                        s.y > tank.getY() && s.y < tank.getY() + 60;
+            } else {                                   // 1/3 水平
+                hit = s.x > tank.getX() && s.x < tank.getX() + 60 &&
+                        s.y > tank.getY() && s.y < tank.getY() + 40;
+            }
+
+            if (hit) {
+                s.isLive = false;                      // 子弹失效
+                tank.isLive = false;                   // 坦克死亡
+                boomVector.add(new Boom(tank.getX(), tank.getY()));  // 爆炸
+                break;                                 // 一颗子弹够了
             }
         }
-
     }
+
+
+
+    /** 敌方 shots 击中我方坦克的判定 */
+    private void hitMyTank(Vector<Shot> shots) {
+        hitTank(shots, my_Tank);   // 直接复用通用判定
+    }
+
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -127,9 +125,18 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         g.fillRect(0, 0, 1000, 750);
 
 
-        //画出自己的坦克（自己的Tank是MyTank）
-        draw_Tank(my_Tank.getX(), my_Tank.getY(), my_Tank.getDirection(),
-                my_Tank.getTpye(), g);
+        // 画我方坦克（0: 我方，1: 敌方）
+        if (my_Tank != null && my_Tank.isLive) {
+            draw_Tank(my_Tank.getX(), my_Tank.getY(),  my_Tank.getDirection(), 0,g);
+
+            // 画我方子弹
+            for (Shot s : my_Tank.shots) {
+                if (s != null && s.isLive) {
+                    g.draw3DRect(s.x, s.y, 2, 2, false);
+                }
+            }
+        }
+
 
 
         //有关敌人坦克的绘制,包括敌人的tank的子弹
@@ -154,27 +161,7 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
                 it.remove();
             }
         }
-        for (int i = 0; i < enemyTankVector.size(); i++) {
-            EnemyTank enemyTank = enemyTankVector.get(i);
-            //当前tank存活才会进行绘制
-            if (enemyTank.isLive == true) {
-                draw_Tank(enemyTank.getX(), enemyTank.getY(), enemyTank.getDirection()
-                        , 1, g);
-                //存活才会绘制敌人tank的子弹
-                for (int j = 0; j < enemyTank.shots.size(); j++) {
-                    Shot shot = enemyTank.shots.get(j);
-                    if (shot.isLive == true) {
-                        g.draw3DRect(shot.x, shot.y, 2, 2, false);
-                    } else {
-                        //Vector中子弹死掉了后要移除，不然一直画死的子弹但是又画不出来导致卡死，关键点！！！
-                        enemyTank.shots.remove(j);
-                    }
-                }
-            }
-            if (enemyTank.isLive == false) {
-                enemyTankVector.remove(enemyTank);
-            }
-        }
+
 
         //画出自己的子弹，由于连发机制的添加，在绘制的时候需要实现相关的遍历了
         g.setColor(Color.red);
@@ -211,25 +198,31 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     @Override
     public void run() {
         while (true) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            try { Thread.sleep(20); } catch (InterruptedException ignored) {}
+
+            /* ===== 1. 敌弹打我 ===== */
+            for (EnemyTank enemy : enemyTankVector) {
+                hitMyTank(enemy.shots);
             }
-            //判断敌人是否被击中
-            if (my_Tank.shot != null && my_Tank.shot.isLive == true) {
-                //此处会有异常出现（每点击J的时候MyTank.shot才不为空）
-                //自己的子弹还活着的时候
-                for (int i = 0; i < enemyTankVector.size(); i++) {
-                    //遍历敌人所有的tank，取出tank来进行Tank判断是否死亡
-                    EnemyTank enemyTank = enemyTankVector.get(i);
-                    HitTank(my_Tank.shots, enemyTank);
-                    //判断敌人的Tank是不是被hit了,击中了就死掉
+
+            /* ===== 2. 我弹打敌 ===== */
+            if (my_Tank.isLive && !my_Tank.shots.isEmpty()) {
+                Iterator<EnemyTank> it = enemyTankVector.iterator();
+                while (it.hasNext()) {
+                    EnemyTank enemy = it.next();
+                    hitTank(my_Tank.shots, enemy);   // 判定
+                    if (!enemy.isLive) it.remove();  // 死了安全删
                 }
             }
-            this.repaint();
+
+            /* ===== 3. 爆炸动画生命周期 ===== */
+            boomVector.removeIf(b -> b.life == 0);
+
+            /* ===== 4. 刷新画面 ===== */
+            repaint();   // 建议留在 EDT；这里直接调用问题也不大
         }
-    }//不断的刷新绘图区域
+    }
+
 
     /**
      * @param x:Tank左上角的坐标X
