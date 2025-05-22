@@ -9,7 +9,7 @@ import java.util.Vector;
 
 //@SuppressWarnings("all")
 public class MyPanel extends JPanel implements KeyListener, Runnable {
-    int EnemySize = 3;
+    int EnemySize = 5;
     MyTank my_Tank = null;
     Vector<EnemyTank> enemyTankVector = new Vector();
     Vector<Boom> boomVector = new Vector();
@@ -21,11 +21,13 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     public MyPanel() {
         //创建自己坦克的位置
-        my_Tank = new MyTank(100, 100);
+        my_Tank = new MyTank(200, 150);
         my_Tank.setSpeed(2);
         //创建敌人的初始坦克
         for (int i = 0; i < EnemySize; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
+            //将这个集合设置给enemyTank对象
+            enemyTank.setEnemyTanks(enemyTankVector);
             enemyTank.setDirection(2);
             //开始启动线程：创建敌人tank自己随机移动的线程
             new Thread(enemyTank).start();
@@ -36,9 +38,9 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             new Thread(s).start();//启动敌人的子弹的线程，姑且成为3号线程
         }
         //再构造器里面初始化图片对象
-        image1 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_1.gif"));
-        image2 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_2.gif"));
-        image3 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/bomb_3.gif"));
+        image1 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/res/bomb_1.gif"));
+        image2 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/res/bomb_2.gif"));
+        image3 = Toolkit.getDefaultToolkit().getImage(MyPanel.class.getResource("/res/bomb_3.gif"));
         //修复bug1
         Toolkit.getDefaultToolkit().prepareImage(image1, -1, -1, null);   // 同步等图像解码
         //        目前你的流程是：
