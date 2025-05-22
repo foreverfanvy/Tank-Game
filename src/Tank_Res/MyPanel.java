@@ -19,6 +19,16 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     Image image2;
     Image image3;
 
+    public void show_info(Graphics g){
+        g.setColor(Color.BLACK);
+        Font font = new Font("宋体", Font.BOLD, 25);
+        g.setFont(font);
+        g.drawString("您累积击毁敌方Tank:",1020,30);
+        draw_Tank(1020,40,0,0,g);
+        g.setColor(Color.BLACK);
+        g.drawString(Recorder.getDieEnemyTankNum()+"",1080,80);
+    }
+
     public MyPanel() {
         //创建自己坦克的位置
         my_Tank = new MyTank(200, 150);
@@ -72,6 +82,8 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             if (hit) {
                 s.isLive = false;                      // 子弹失效
                 tank.isLive = false;                   // 坦克死亡
+                if(tank instanceof EnemyTank)Recorder.add_num();
+                //将记录的值来进行添加，仅仅是敌人tank才行，这种写法是因为后面的hitMyTank的方法
                 boomVector.add(new Boom(tank.getX(), tank.getY()));  // 爆炸
                 break;                                 // 一颗子弹够了
             }
@@ -125,7 +137,7 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0, 0, 1000, 750);
-
+        show_info(g);
 
         // 画我方坦克（0: 我方，1: 敌方）
         if (my_Tank != null && my_Tank.isLive) {
